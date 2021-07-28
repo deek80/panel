@@ -1,13 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import {CssBaseline} from "@material-ui/core";
-import {ThemeProvider, createMuiTheme} from "@material-ui/core/styles";
-import {cyan} from "@material-ui/core/colors";
+import {ThemeProvider, createTheme} from "@material-ui/core/styles";
 import App from "./App";
 
-const theme = createMuiTheme({
+const theme = createTheme({
   palette: {
-    primary: cyan,
+    primary: {main: "#546e7a"},
+    secondary: {main: "#ff9800"},
   },
 });
 
