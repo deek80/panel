@@ -1,5 +1,5 @@
-import React from "react";
-import {Box, Chip, Paper} from "@material-ui/core";
+import React, {useState} from "react";
+import {Box, Chip, TextField} from "@material-ui/core";
 
 const outlets = [
   "Garage",
@@ -19,45 +19,52 @@ const outlets = [
 
 const randomInt = max => Math.floor(Math.random() * max);
 const randomOutlet = () => outlets[randomInt(outlets.length)];
-const randomSwitch = number => {
-  const outlets = [...Array(randomInt(5) + 1).keys()].map(randomOutlet);
-  const amps = randomInt(20) + 1;
-  return {number, amps, outlets};
-};
+const randomSwitch = number => ({
+  number,
+  outlets: [...Array(randomInt(6)).keys()].map(randomOutlet),
+});
+const switches = [...Array(16).keys()]
+  .map(i => i * 2 + 1)
+  .map(i => ({
+    left: randomSwitch(i),
+    right: randomSwitch(i + 1),
+  }));
 
-const Switch = ({number, amps, outlets}) => (
+const isMatchingOutlet = (outlet, text) => outlet.includes(text);
+const isMatchingSwitch = (swtch, text) =>
+  swtch.outlets.find(outlet => isMatchingOutlet(outlet, text));
+
+const Switch = ({number, outlets, enabled}) => (
   <>
-    <Box flex={1}>#{number}</Box>
-    {
-      //<Box flex={1}>{amps}A</Box>
-    }
+    <Box color={enabled ? "text.primary" : "text.disabled"} flex={1}>
+      #{number}
+    </Box>
     <Box flex={11}>
       {outlets.map(outlet => (
-        <Chip label={outlet} size="small" />
+        <Chip label={outlet} size="small" disabled={!enabled} />
       ))}
     </Box>
   </>
 );
 
-const Row = ({left, right}) => {
+const Panel = () => {
+  const [search, setSearch] = useState("");
+  const handleSearchChange = event => {
+    setSearch(event.target.value);
+  };
   return (
-    <Box display="flex">
-      <Switch {...left} />
-      <Switch {...right} />
-    </Box>
-  );
-};
-
-const Column = () => {
-  return (
-    <Box display="flex" flexDirection="column">
-      {[...Array(16).keys()]
-        .map(i => i * 2 + 1)
-        .map(i => (
-          <Row left={randomSwitch(i)} right={randomSwitch(i + 1)} />
+    <>
+      <TextField label="Search" size="small" onChange={handleSearchChange} />
+      <Box display="flex" flexDirection="column">
+        {switches.map(({left, right}) => (
+          <Box display="flex">
+            <Switch {...left} enabled={isMatchingSwitch(left, search)} />
+            <Switch {...right} enabled={isMatchingSwitch(right, search)} />
+          </Box>
         ))}
-    </Box>
+      </Box>
+    </>
   );
 };
 
-export default Column;
+export default Panel;
